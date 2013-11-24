@@ -89,13 +89,12 @@ shmatmaton.Instruction.prototype.nop = function() {
 
 
 shmatmaton.Instruction.prototype.funcWrap = function() {
-	var funcArgs = [];
-	for (i=0; i<this.args.length; i++)
-		funcArgs.push(this.args[i].value);
+	var argStr = this.args.length ? JSON.stringify(this.args[0].value) : "";
+	for (i=1; i<this.args.length; i++)
+		argStr += "," + JSON.stringify(this.args[i].value);
 	var result = new shmatmaton.Instruction();
 	try {
-		var func = eval(this.funcName);
-		result.value = func.apply(window, funcArgs);
+		result.value = eval(this.funcName + "(" + argStr + ")" );
 	}
 	catch (e) {
 		if (shmatmaton.log)
