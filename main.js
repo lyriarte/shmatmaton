@@ -48,8 +48,6 @@ shmatmaton.Instruction = function(str) {
 			};
 		}
 	}
-	if (shmatmaton.log)
-		shmatmaton.log(str + " => " + JSON.stringify(this));
 	return this;
 };
 
@@ -176,6 +174,8 @@ shmatmaton.parse = function(instructions) {
 	shmatmaton.code = new Array(instructions.length);
 	for (var i=0; i<instructions.length; i++) {
 		shmatmaton.code[i] = new shmatmaton.Instruction(instructions[i]);
+		if (shmatmaton.log)
+			shmatmaton.log(i + ": " + instructions[i] + " => " + JSON.stringify(shmatmaton.code[i]));
 	}
 };
 
