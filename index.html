@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script src="main.js"></script>
+        <script type="text/javascript">
+        shmatmaton.log = function(str) {
+			document.getElementById('log').innerHTML += str + "<br>"
+        }
+		function evalScript() {
+			var instructions = document.getElementById('script').value.split(/\n\s*/);
+			shmatmaton.parse(instructions);
+		}
+        </script>
+    </head>
+   <body>
+        <center><h1>shmatmaton</h1></center>
+<p>Hit <b>eval</b> to parse the source code, then <b>reset</b>. Hit <b>step</b> to execute the next instruction.
+</p>
+        <table style="width:95%">
+        <tr>
+        <td style="width:50%">
+<textarea rows="24" id="script">
+"The Answer is: "
+5
+10
+*
+8
+-
++
+alert
+</textarea>
+        </td>
+        <td style="width:50%">
+        <pre id="log" style="background-color: #faa;"></pre>
+        </td>
+        </table>
+		<br>
+		<input type="button" value="eval" onclick="evalScript()"/>
+		<input type="button" value="reset" onclick="shmatmaton.reset()"/>
+		<input type="button" value="step" onclick="shmatmaton.step()"/>
+		<input type="button" value="clear log" onclick="document.getElementById('log').innerHTML='';"/>
+		<br>
+   </body>
+</html>

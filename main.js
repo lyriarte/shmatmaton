@@ -56,9 +56,13 @@ shmatmaton.Instruction = function(str) {
 				}
 			}
 			catch (ee) {
+				if (shmatmaton.log)
+					shmatmaton.log(ee);
 			};
 		}
 	}
+	if (shmatmaton.log)
+		shmatmaton.log(str + " => " + JSON.stringify(this));
 	return this;
 };
 
@@ -94,6 +98,8 @@ shmatmaton.Instruction.prototype.funcWrap = function() {
 		result.value = func.apply(window, funcArgs);
 	}
 	catch (e) {
+		if (shmatmaton.log)
+			shmatmaton.log(e);
 		return;
 	}
 	if (typeof(result.value) == 'undefined')
@@ -183,6 +189,8 @@ shmatmaton.step = function() {
 		default:
 			shmatmaton.stack.push(inst);
 	}
+	if (shmatmaton.log)
+		shmatmaton.log("ip: " + shmatmaton.ip + ", stack: " + JSON.stringify(shmatmaton.stack));
 	shmatmaton.ip++;
 };
 
