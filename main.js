@@ -153,6 +153,15 @@ shmatmaton.Instruction.prototype.poke = function(addr, value) {
 };
 
 
+shmatmaton.Instruction.prototype.jnz = function(addr, arg) {
+	if (addr.type != 'number' || shmatmaton.code[addr.value] == undefined)
+		return;
+	if (['number','string'].indexOf(arg.type) != -1 && !arg.value)
+		return;
+	shmatmaton.ip = addr.value;
+};
+
+
 
 /*****************************************************************************/
 
@@ -163,7 +172,8 @@ shmatmaton.instructions = {
 	'/': shmatmaton.Instruction.prototype.div,
 	'^': shmatmaton.Instruction.prototype.pow,
 	'peek': shmatmaton.Instruction.prototype.peek,
-	'poke': shmatmaton.Instruction.prototype.poke
+	'poke': shmatmaton.Instruction.prototype.poke,
+	'jnz': shmatmaton.Instruction.prototype.jnz
 };
 
 
@@ -188,7 +198,11 @@ shmatmaton.reset = function() {
 
 
 shmatmaton.step = function() {
-	var inst = shmatmaton.code[shmatmaton.ip];
+	if (shmatmaton.log)
+		shmatmaton.log("===> ip: " + shmatmaton.ip);
+	var inst = shmatmaton.code[shmatmaton.ip++];
+	if (inst == undefined)
+		return;
 	switch (inst.type) {
 		case 'function': 
 			var args = [];
@@ -203,11 +217,9 @@ shmatmaton.step = function() {
 			shmatmaton.stack.push(inst);
 	}
 	if (shmatmaton.log) {
-		shmatmaton.log("===> ip: " + shmatmaton.ip);
 		shmatmaton.log("stack: " + JSON.stringify(shmatmaton.stack));
 		shmatmaton.log("heap: " + JSON.stringify(shmatmaton.heap));
 	}
-	shmatmaton.ip++;
 };
 
 

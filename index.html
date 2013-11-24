@@ -21,21 +21,19 @@
         <td style="width:50%">
 <textarea rows="24" id="script">
 0
-"World!"
-1
-"Hello"
+2
 poke
-poke
-
-1
-peek
-", "
-+
-
+0
 0
 peek
-+
-
+1
+-
+poke
+3
+0
+peek
+jnz
+"fin"
 alert
 </textarea>
 		<input type="button" value="eval" onclick="evalScript()"/>
