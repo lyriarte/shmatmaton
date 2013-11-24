@@ -45,6 +45,18 @@ shmatmaton.Instruction = function(str) {
 		case '^':
 			this.guess(shmatmaton.Instruction.prototype.pow);
 			break;
+		default:
+			try {
+				var func = eval(str);
+				if (typeof(func) == 'function') {
+					this.guess(shmatmaton.Instruction.prototype.funcWrap);
+					this.arity = func.length;
+					this.funcHandle = func;
+					this.funcName = str;
+				}
+			}
+			catch (ee) {
+			};
 		}
 	}
 	return this;
@@ -69,6 +81,25 @@ shmatmaton.Instruction.prototype.guess = function(arg) {
 
 shmatmaton.Instruction.prototype.nop = function() {
 	return;
+};
+
+
+shmatmaton.Instruction.prototype.funcWrap = function() {
+	var funcArgs = [];
+	for (i=0; i<this.args.length; i++)
+		funcArgs.push(this.args[i].value);
+	var result = new shmatmaton.Instruction();
+	try {
+		var func = eval(this.funcName);
+		result.value = func.apply(window, funcArgs);
+	}
+	catch (e) {
+		return;
+	}
+	if (typeof(result.value) == 'undefined')
+		return;
+	result.guess();
+	return result;
 };
 
 
@@ -144,7 +175,8 @@ shmatmaton.step = function() {
 			var args = [];
 			for (var i=0; i<inst.arity; i++)
 				args.unshift(shmatmaton.stack.pop());
-			var result = inst.value.apply(window, args);
+			inst.args = args;
+			var result = inst.value.apply(inst, args);
 			if (result)
 				shmatmaton.stack.push(result);
 			break;
