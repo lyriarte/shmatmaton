@@ -2,6 +2,7 @@
 <html>
     <head>
         <script src="main.js"></script>
+        <script src="matrix.js"></script>
         <script type="text/javascript">
         shmatmaton.log = function(str) {
 			document.getElementById('log').innerHTML += str + "<br>"
@@ -21,20 +22,19 @@
         <td style="width:50%">
 <textarea rows="24" id="script">
 0
-2
+[[1,0,0],[0,1,0],[0,0,1]]
 poke
-0
-0
-peek
 1
--
+[[1,2,4],[2,2,0],[3,0,4]]
 poke
-3
-0
+2
+[[1],[2],[3]]
+poke
+1
 peek
-jnz
-"fin"
-alert
+2
+peek
+*
 </textarea>
 		<input type="button" value="eval" onclick="evalScript()"/>
 		<input type="button" value="reset" onclick="shmatmaton.reset()"/>

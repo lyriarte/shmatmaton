@@ -10,7 +10,7 @@
 
 var shmatmaton = {
 	version: '0.0.1',
-	types: ['number', 'string', 'function'],
+	types: ['number', 'string', 'function', 'matrix'],
 	heap: [],
 	stack: [],
 	code: [],
@@ -57,6 +57,10 @@ shmatmaton.Instruction.prototype.guess = function(arg) {
 		this.value = arg;
 	this.type = typeof this.value;
 	this.arity = undefined;
+	if (this.type == 'object' && this.value.length && this.value[0].length) {
+		this.value = new Matrix(this.value.length, this.value[0].length, this.value);
+		this.type = 'matrix';
+	}
 	if (shmatmaton.types.indexOf(this.type) == -1) {
 		this.type = 'number';
 		this.value = this.value ? 1 : 0;
@@ -95,6 +99,11 @@ shmatmaton.Instruction.prototype.funcWrap = function() {
 
 shmatmaton.Instruction.prototype.add = function(arg1, arg2) {
 	var result = new shmatmaton.Instruction();
+	if (arg1.type == 'matrix' && arg2.type == 'matrix') {
+		result.value = arg1.value.add(arg2.value);
+		result.type = 'matrix';
+		return result;
+	}
 	if (['number','string'].indexOf(arg1.type) == -1
 		|| ['number','string'].indexOf(arg2.type) == -1)
 		return result;
@@ -114,6 +123,16 @@ shmatmaton.Instruction.prototype.sub = function(arg1, arg2) {
 
 shmatmaton.Instruction.prototype.mul = function(arg1, arg2) {
 	var result = new shmatmaton.Instruction();
+	if (arg1.type == 'matrix' && arg2.type == 'matrix') {
+		result.value = arg1.value.mul(arg2.value);
+		result.type = 'matrix';
+		return result;
+	}
+	if (arg1.type == 'number' && arg2.type == 'matrix') {
+		result.value = arg2.value.mulNum(arg1.value);
+		result.type = 'matrix';
+		return result;
+	}
 	if (arg1.type != 'number' || arg2.type != 'number')
 		return result;
 	result.guess(arg1.value * arg2.value);
@@ -123,6 +142,12 @@ shmatmaton.Instruction.prototype.mul = function(arg1, arg2) {
 
 shmatmaton.Instruction.prototype.div = function(arg1, arg2) {
 	var result = new shmatmaton.Instruction();
+	if (arg1.type == 'number' && arg2.type == 'matrix'
+		&& arg1.value == 1) {
+		result.value = arg2.value.inv();
+		result.type = 'matrix';
+		return result;
+	}
 	if (arg1.type != 'number' || arg2.type != 'number')
 		return result;
 	result.guess(arg1.value / arg2.value);
@@ -132,6 +157,12 @@ shmatmaton.Instruction.prototype.div = function(arg1, arg2) {
 
 shmatmaton.Instruction.prototype.pow = function(arg1, arg2) {
 	var result = new shmatmaton.Instruction();
+	if (arg1.type == 'matrix' && arg2.type == 'number'
+		&& arg1.value == -1) {
+		result.value = arg1.value.inv();
+		result.type = 'matrix';
+		return result;
+	}
 	if (arg1.type != 'number' || arg2.type != 'number')
 		return result;
 	result.guess(Math.pow(arg1.value,arg2.value));
