@@ -45,6 +45,12 @@ shmatmaton.Instruction = function(str) {
 		case '^':
 			this.guess(shmatmaton.Instruction.prototype.pow);
 			break;
+		case 'peek':
+			this.guess(shmatmaton.Instruction.prototype.peek);
+			break;
+		case 'poke':
+			this.guess(shmatmaton.Instruction.prototype.poke);
+			break;
 		default:
 			try {
 				var func = eval(str);
@@ -154,6 +160,20 @@ shmatmaton.Instruction.prototype.pow = function(arg1, arg2) {
 };
 
 
+shmatmaton.Instruction.prototype.peek = function(addr) {
+	if (addr.type != 'number' || shmatmaton.heap[addr.value] == undefined)
+		return new shmatmaton.Instruction();
+	return shmatmaton.heap[addr.value];
+};
+
+
+shmatmaton.Instruction.prototype.poke = function(addr, value) {
+	if (addr.type != 'number')
+		return;
+	shmatmaton.heap[addr.value] = value;
+};
+
+
 
 /*****************************************************************************/
 
@@ -188,8 +208,11 @@ shmatmaton.step = function() {
 		default:
 			shmatmaton.stack.push(inst);
 	}
-	if (shmatmaton.log)
-		shmatmaton.log("ip: " + shmatmaton.ip + ", stack: " + JSON.stringify(shmatmaton.stack));
+	if (shmatmaton.log) {
+		shmatmaton.log("===> ip: " + shmatmaton.ip);
+		shmatmaton.log("stack: " + JSON.stringify(shmatmaton.stack));
+		shmatmaton.log("heap: " + JSON.stringify(shmatmaton.heap));
+	}
 	shmatmaton.ip++;
 };
 
