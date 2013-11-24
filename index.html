@@ -7,7 +7,7 @@
 			document.getElementById('log').innerHTML += str + "<br>"
         }
 		function evalScript() {
-			var instructions = document.getElementById('script').value.split(/\n\s*/);
+			var instructions = document.getElementById('script').value.split("\n");
 			shmatmaton.parse(instructions);
 		}
         </script>
@@ -26,25 +26,28 @@
 "Hello"
 poke
 poke
+
 1
 peek
 ", "
 +
+
 0
 peek
 +
+
 alert
 </textarea>
+		<input type="button" value="eval" onclick="evalScript()"/>
+		<input type="button" value="reset" onclick="shmatmaton.reset()"/>
+		<input type="button" value="step" onclick="shmatmaton.step()"/>
         </td>
         <td style="width:50%">
         <pre id="log" style="background-color: #faa;"></pre>
         </td>
         </table>
 		<br>
-		<input type="button" value="eval" onclick="evalScript()"/>
-		<input type="button" value="reset" onclick="shmatmaton.reset()"/>
-		<input type="button" value="step" onclick="shmatmaton.step()"/>
-		<input type="button" value="clear log" onclick="document.getElementById('log').innerHTML='';"/>
+		<input type="button"  style="width:95%" value="clear log" onclick="document.getElementById('log').innerHTML='';"/>
 		<br>
    </body>
 </html>
