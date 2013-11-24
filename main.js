@@ -29,31 +29,12 @@ shmatmaton.Instruction = function(str) {
 		this.guess(JSON.parse(str));
 	}
 	catch (e) {
-		switch (str) {
-		case '+':
-			this.guess(shmatmaton.Instruction.prototype.add);
-			break;
-		case '-':
-			this.guess(shmatmaton.Instruction.prototype.sub);
-			break;
-		case '*':
-			this.guess(shmatmaton.Instruction.prototype.mul);
-			break;
-		case '/':
-			this.guess(shmatmaton.Instruction.prototype.div);
-			break;
-		case '^':
-			this.guess(shmatmaton.Instruction.prototype.pow);
-			break;
-		case 'peek':
-			this.guess(shmatmaton.Instruction.prototype.peek);
-			break;
-		case 'poke':
-			this.guess(shmatmaton.Instruction.prototype.poke);
-			break;
-		default:
+		var func = shmatmaton.instructions[str];
+		if (func)
+			this.guess(func);
+		else {
 			try {
-				var func = eval(str);
+				func = eval(str);
 				if (typeof(func) == 'function') {
 					this.guess(shmatmaton.Instruction.prototype.funcWrap);
 					this.arity = func.length;
@@ -177,6 +158,19 @@ shmatmaton.Instruction.prototype.poke = function(addr, value) {
 
 /*****************************************************************************/
 
+shmatmaton.instructions = {
+	'+': shmatmaton.Instruction.prototype.add,
+	'-': shmatmaton.Instruction.prototype.sub,
+	'*': shmatmaton.Instruction.prototype.mul,
+	'/': shmatmaton.Instruction.prototype.div,
+	'^': shmatmaton.Instruction.prototype.pow,
+	'peek': shmatmaton.Instruction.prototype.peek,
+	'poke': shmatmaton.Instruction.prototype.poke
+};
+
+
+
+/*****************************************************************************/
 
 shmatmaton.parse = function(instructions) {
 	shmatmaton.code = new Array(instructions.length);
