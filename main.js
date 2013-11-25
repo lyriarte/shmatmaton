@@ -184,12 +184,18 @@ shmatmaton.Instruction.prototype.poke = function(addr, value) {
 };
 
 
-shmatmaton.Instruction.prototype.jnz = function(addr, arg) {
+shmatmaton.Instruction.prototype.jnz = function(arg, addr) {
 	if (addr.type != 'number' || shmatmaton.code[addr.value] == undefined)
 		return;
 	if (['number','string'].indexOf(arg.type) != -1 && !arg.value)
 		return;
 	shmatmaton.ip = addr.value;
+};
+
+
+shmatmaton.Instruction.prototype.dup = function(arg) {
+	shmatmaton.stack.push(arg);
+	return arg;
 };
 
 
@@ -204,7 +210,8 @@ shmatmaton.instructions = {
 	'^': shmatmaton.Instruction.prototype.pow,
 	'peek': shmatmaton.Instruction.prototype.peek,
 	'poke': shmatmaton.Instruction.prototype.poke,
-	'jnz': shmatmaton.Instruction.prototype.jnz
+	'jnz': shmatmaton.Instruction.prototype.jnz,
+	'dup': shmatmaton.Instruction.prototype.dup
 };
 
 

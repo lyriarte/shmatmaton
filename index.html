@@ -20,25 +20,30 @@
         <table style="width:95%">
         <tr>
         <td style="width:50%">
-<textarea rows="24" id="script">
-0
-[[1,0,0],[0,1,0],[0,0,1]]
-poke
-1
-[[1,2,4],[2,2,0],[3,0,4]]
-poke
-2
-[[1],[2],[3]]
-poke
-1
-peek
-2
-peek
-*
-</textarea>
 		<input type="button" value="eval" onclick="evalScript()"/>
 		<input type="button" value="reset" onclick="shmatmaton.reset()"/>
 		<input type="button" value="step" onclick="shmatmaton.step()"/>
+		<br>
+<textarea rows="24" id="script">
+0
+[[1,2,4],[2,2,0],[3,0,4]]
+poke
+
+3
+1
+-
+dup
+5
+jnz
+
+1
+0
+peek
+/
+0
+peek
+*
+</textarea>
         </td>
         <td style="width:50%">
         <pre id="log" style="background-color: #faa;"></pre>
