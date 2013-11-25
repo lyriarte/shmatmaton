@@ -14,7 +14,7 @@ var shmatmaton = {
 	heap: [],
 	stack: [],
 	code: [],
-	ip: -1
+	ip: 0
 };
 
 
@@ -171,7 +171,7 @@ shmatmaton.Instruction.prototype.pow = function(arg1, arg2) {
 
 
 shmatmaton.Instruction.prototype.peek = function(addr) {
-	if (addr.type != 'number' || shmatmaton.heap[addr.value] == undefined)
+	if (addr.type != 'number' || !shmatmaton.heap[addr.value])
 		return new shmatmaton.Instruction();
 	return shmatmaton.heap[addr.value];
 };
@@ -185,7 +185,7 @@ shmatmaton.Instruction.prototype.poke = function(addr, value) {
 
 
 shmatmaton.Instruction.prototype.jnz = function(arg, addr) {
-	if (addr.type != 'number' || shmatmaton.code[addr.value] == undefined)
+	if (addr.type != 'number' || !shmatmaton.code[addr.value])
 		return;
 	if (['number','string'].indexOf(arg.type) != -1 && !arg.value)
 		return;
@@ -219,6 +219,7 @@ shmatmaton.instructions = {
 /*****************************************************************************/
 
 shmatmaton.parse = function(instructions) {
+	shmatmaton.ip = 0;
 	shmatmaton.code = new Array(instructions.length);
 	for (var i=0; i<instructions.length; i++) {
 		shmatmaton.code[i] = new shmatmaton.Instruction(instructions[i]);
@@ -239,8 +240,8 @@ shmatmaton.step = function() {
 	if (shmatmaton.log)
 		shmatmaton.log("===> ip: " + shmatmaton.ip);
 	var inst = shmatmaton.code[shmatmaton.ip++];
-	if (inst == undefined)
-		return;
+	if (!inst)
+		return -1;
 	switch (inst.type) {
 		case 'function': 
 			var args = [];
@@ -258,6 +259,7 @@ shmatmaton.step = function() {
 		shmatmaton.log("stack: " + JSON.stringify(shmatmaton.stack));
 		shmatmaton.log("heap: " + JSON.stringify(shmatmaton.heap));
 	}
+	return shmatmaton.ip;
 };
 
 

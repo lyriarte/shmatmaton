@@ -15,15 +15,17 @@
     </head>
    <body>
         <center><h1>shmatmaton</h1></center>
-<p>Hit <b>eval</b> to parse the source code, then <b>reset</b>. Hit <b>step</b> to execute the next instruction.
+<p>Hit <b>eval</b> to parse the source code, <b>step</b> to execute the next instruction, <b>reset</b> to start over. 
 </p>
+		<input type="button" style="width:32%" value="eval" onclick="evalScript()"/>
+		<input type="button" style="width:32%" value="reset" onclick="shmatmaton.reset()"/>
+		<input type="button" style="width:32%" value="step" onclick="shmatmaton.step()"/>
+		<br>
+		<input type="button"  style="width:95%" value="clear log" onclick="document.getElementById('log').innerHTML='';"/>
+		<br>
         <table style="width:95%">
         <tr>
         <td style="width:50%">
-		<input type="button" value="eval" onclick="evalScript()"/>
-		<input type="button" value="reset" onclick="shmatmaton.reset()"/>
-		<input type="button" value="step" onclick="shmatmaton.step()"/>
-		<br>
 <textarea rows="24" id="script">
 0
 [[1,2,4],[2,2,0],[3,0,4]]
@@ -49,8 +51,5 @@ peek
         <pre id="log" style="background-color: #faa;"></pre>
         </td>
         </table>
-		<br>
-		<input type="button"  style="width:95%" value="clear log" onclick="document.getElementById('log').innerHTML='';"/>
-		<br>
    </body>
 </html>
