@@ -150,9 +150,16 @@ shmatmaton.Instruction.prototype.guess = function(arg) {
 	this.type = typeof this.value;
 	this.arity = undefined;
 	// Interpret two dimensional arrays as matrix
-	if (this.type == 'object' && this.value.length && this.value[0].length) {
-		this.value = new Matrix(this.value.length, this.value[0].length, this.value);
-		this.type = 'matrix';
+	if (this.type == 'object') {
+		if (this.value.length && this.value[0].length) {
+			this.value = new Matrix(this.value.length, this.value[0].length, this.value);
+			this.type = 'matrix';
+		}
+		else {
+			this.type = 'function';
+			this.transitions = this.value;
+			this.value = shmatmaton.Instruction.prototype.trans;
+		}
 	}
 	// Interpret un-registered types as nop
 	if (shmatmaton.types.indexOf(this.type) == -1) {
@@ -347,6 +354,16 @@ shmatmaton.Instruction.prototype.dup = function(arg) {
 };
 
 
+shmatmaton.Instruction.prototype.trans = function(arg) {
+	for (var t in this.transitions) {
+		if (arg.value == t) {
+			shmatmaton.ip = this.transitions[t];
+			break;
+		}
+	}
+};
+
+
 
 /*****************************************************************************/
 
@@ -360,7 +377,8 @@ shmatmaton.instructions = {
 	'peek': shmatmaton.Instruction.prototype.peek,
 	'poke': shmatmaton.Instruction.prototype.poke,
 	'jnz': shmatmaton.Instruction.prototype.jnz,
-	'dup': shmatmaton.Instruction.prototype.dup
+	'dup': shmatmaton.Instruction.prototype.dup,
+	'trans': shmatmaton.Instruction.prototype.trans,
 };
 
 
