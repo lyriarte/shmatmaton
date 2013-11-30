@@ -49,7 +49,7 @@ All instructions are executed on the stack, in reverse Polish order. That is, in
   * '/' : a / b, push arg1 divided by arg2.
   * '^' : a ^ b, push arg1 raised to the power of arg2.
   * 'peek' addr: push the content of the heap at address addr. push a NOP on null content.
-  * 'poke' addr, value: put value in the heap at address addr.
+  * 'poke' value, addr: put value in the heap at address addr.
   * 'jnz' arg, addr: jump to addr if arg is not numeric zero, or empty string.
   * 'dup' arg: duplicates arg on the stack.
 

@@ -21,21 +21,29 @@ var shmatmaton = {
 
 /*****************************************************************************/
 
+
+// Create an Instruction from a line of code 
 shmatmaton.Instruction = function(str) {
+	// Initialize with a nop
 	this.guess(shmatmaton.Instruction.prototype.nop);
 	if (!str)
 		return this;
+	// Try base types
 	try {
 		this.guess(JSON.parse(str));
 	}
 	catch (e) {
+		// Try shmatmaton instructions
 		var func = shmatmaton.instructions[str];
 		if (func)
 			this.guess(func);
 		else {
 			try {
+				// Let the platform evaluate the string
 				func = eval(str);
+				// Check if the string evaluates as a function on the platform
 				if (typeof(func) == 'function') {
+					// Make it an instruction that will wrap the platform function
 					this.guess(shmatmaton.Instruction.prototype.funcWrap);
 					this.arity = func.length;
 					this.funcHandle = func;
@@ -52,23 +60,24 @@ shmatmaton.Instruction = function(str) {
 };
 
 
+// Initialize an intruction by guessing its value
 shmatmaton.Instruction.prototype.guess = function(arg) {
 	if (arg != undefined)
 		this.value = arg;
 	this.type = typeof this.value;
 	this.arity = undefined;
+	// Interpret two dimensional arrays as matrix
 	if (this.type == 'object' && this.value.length && this.value[0].length) {
 		this.value = new Matrix(this.value.length, this.value[0].length, this.value);
 		this.type = 'matrix';
 	}
+	// Interpret un-registered types as nop
 	if (shmatmaton.types.indexOf(this.type) == -1) {
-		this.type = 'number';
-		this.value = this.value ? 1 : 0;
-		return 1;
+		this.type = 'function';
+		this.value = shmatmaton.Instruction.prototype.nop;
 	}
 	if (this.type == 'function')
 		this.arity = this.value.length;
-	return 0;
 };
 
 
@@ -77,7 +86,9 @@ shmatmaton.Instruction.prototype.nop = function() {
 };
 
 
+// Wrap a platform function executiopn
 shmatmaton.Instruction.prototype.funcWrap = function() {
+	// Build arg strings
 	var argStr = this.args.length ? JSON.stringify(this.args[0].value) : "";
 	for (i=1; i<this.args.length; i++)
 		argStr += "," + JSON.stringify(this.args[i].value);
@@ -177,7 +188,7 @@ shmatmaton.Instruction.prototype.peek = function(addr) {
 };
 
 
-shmatmaton.Instruction.prototype.poke = function(addr, value) {
+shmatmaton.Instruction.prototype.poke = function(value, addr) {
 	if (addr.type != 'number')
 		return;
 	shmatmaton.heap[addr.value] = value;
@@ -239,19 +250,25 @@ shmatmaton.reset = function() {
 shmatmaton.step = function() {
 	if (shmatmaton.log)
 		shmatmaton.log("===> ip: " + shmatmaton.ip);
+	// Get current instruction and increment instruction pointer
 	var inst = shmatmaton.code[shmatmaton.ip++];
 	if (!inst)
 		return -1;
 	switch (inst.type) {
+		// execute functions. may affect instruction pointer
 		case 'function': 
+			// pop arguments according function arity, last argument is top of the stack
 			var args = [];
 			for (var i=0; i<inst.arity; i++)
 				args.unshift(shmatmaton.stack.pop());
+			// attach arguments to instruction object for platform function wrappers
 			inst.args = args;
 			var result = inst.value.apply(inst, args);
+			// push result if any
 			if (result)
 				shmatmaton.stack.push(result);
 			break;
+		// just push base types
 		default:
 			shmatmaton.stack.push(inst);
 	}
@@ -259,6 +276,7 @@ shmatmaton.step = function() {
 		shmatmaton.log("stack: " + JSON.stringify(shmatmaton.stack));
 		shmatmaton.log("heap: " + JSON.stringify(shmatmaton.heap));
 	}
+	// Return next instruction pointer
 	return shmatmaton.ip;
 };
 
