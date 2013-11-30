@@ -86,6 +86,11 @@ shmatmaton.Instruction.prototype.nop = function() {
 };
 
 
+shmatmaton.Instruction.prototype.isNop = function() {
+	return this.value == shmatmaton.Instruction.prototype.nop;
+};
+
+
 // Wrap a platform function executiopn
 shmatmaton.Instruction.prototype.funcWrap = function() {
 	// Build arg strings
@@ -109,6 +114,10 @@ shmatmaton.Instruction.prototype.funcWrap = function() {
 
 
 shmatmaton.Instruction.prototype.add = function(arg1, arg2) {
+	// nop is the identity element
+	if (arg1.isNop()) return arg2;
+	if (arg2.isNop()) return arg1;
+	// on invalid arguments return nop
 	var result = new shmatmaton.Instruction();
 	if (arg1.type == 'matrix' && arg2.type == 'matrix') {
 		result.value = arg1.value.add(arg2.value);
@@ -124,6 +133,10 @@ shmatmaton.Instruction.prototype.add = function(arg1, arg2) {
 
 
 shmatmaton.Instruction.prototype.sub = function(arg1, arg2) {
+	// nop is the identity element
+	if (arg1.isNop()) return arg2;
+	if (arg2.isNop()) return arg1;
+	// on invalid arguments return nop
 	var result = new shmatmaton.Instruction();
 	if (arg1.type != 'number' || arg2.type != 'number')
 		return result;
@@ -133,6 +146,10 @@ shmatmaton.Instruction.prototype.sub = function(arg1, arg2) {
 
 
 shmatmaton.Instruction.prototype.mul = function(arg1, arg2) {
+	// nop is the identity element
+	if (arg1.isNop()) return arg2;
+	if (arg2.isNop()) return arg1;
+	// on invalid arguments return nop
 	var result = new shmatmaton.Instruction();
 	if (arg1.type == 'matrix' && arg2.type == 'matrix') {
 		result.value = arg1.value.mul(arg2.value);
@@ -152,6 +169,10 @@ shmatmaton.Instruction.prototype.mul = function(arg1, arg2) {
 
 
 shmatmaton.Instruction.prototype.div = function(arg1, arg2) {
+	// nop is the identity element
+	if (arg1.isNop()) return arg2;
+	if (arg2.isNop()) return arg1;
+	// on invalid arguments return nop
 	var result = new shmatmaton.Instruction();
 	if (arg1.type == 'number' && arg2.type == 'matrix'
 		&& arg1.value == 1) {
@@ -167,6 +188,10 @@ shmatmaton.Instruction.prototype.div = function(arg1, arg2) {
 
 
 shmatmaton.Instruction.prototype.pow = function(arg1, arg2) {
+	// nop is the identity element
+	if (arg1.isNop()) return arg2;
+	if (arg2.isNop()) return arg1;
+	// on invalid arguments return nop
 	var result = new shmatmaton.Instruction();
 	if (arg1.type == 'matrix' && arg2.type == 'number'
 		&& arg1.value == -1) {
@@ -214,6 +239,7 @@ shmatmaton.Instruction.prototype.dup = function(arg) {
 /*****************************************************************************/
 
 shmatmaton.instructions = {
+	'nop': shmatmaton.Instruction.prototype.nop,
 	'+': shmatmaton.Instruction.prototype.add,
 	'-': shmatmaton.Instruction.prototype.sub,
 	'*': shmatmaton.Instruction.prototype.mul,
@@ -260,7 +286,7 @@ shmatmaton.step = function() {
 			// pop arguments according function arity, last argument is top of the stack
 			var args = [];
 			for (var i=0; i<inst.arity; i++)
-				args.unshift(shmatmaton.stack.pop());
+				args.unshift(shmatmaton.stack.length ? shmatmaton.stack.pop() : new shmatmaton.Instruction());
 			// attach arguments to instruction object for platform function wrappers
 			inst.args = args;
 			var result = inst.value.apply(inst, args);
