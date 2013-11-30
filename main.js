@@ -10,12 +10,95 @@
 
 var shmatmaton = {
 	version: '0.0.1',
-	types: ['number', 'string', 'function', 'matrix'],
+	types: ['function', 'matrix', 'number', 'string'],
 	heap: [],
 	stack: [],
 	code: [],
 	ip: 0
 };
+
+
+
+/*****************************************************************************/
+
+shmatmaton.matrixAddMatrix = function(m1, m2) {
+	var result = new shmatmaton.Instruction();
+	var value = m1.add(m2);
+	if (value) {
+		result.value = value;
+		result.type = 'matrix';
+	}
+	return result;
+}
+
+shmatmaton.matrixMulMatrix = function(m1, m2) {
+	var result = new shmatmaton.Instruction();
+	var value = m1.mul(m2);
+	if (value) {
+		result.value = value;
+		result.type = 'matrix';
+	}
+	return result;
+}
+
+shmatmaton.matrixAddNumber = function(m, n) {
+	var result = new shmatmaton.Instruction();
+	result.value = m.addNum(n);
+	result.type = 'matrix';
+	return result;
+}
+
+shmatmaton.matrixMulNumber = function(m, n) {
+	var result = new shmatmaton.Instruction();
+	result.value = m.mulNum(n);
+	result.type = 'matrix';
+	return result;
+}
+
+shmatmaton.matrixPowNumber = function(m, n) {
+	var result = new shmatmaton.Instruction();
+	if (n < 0) {
+		var inv = m.inv();
+		if (!inv)
+			return result;
+		m = inv;
+		n = -n;
+	}
+	result.value = m;
+	for (var i=1; i<n; i++)
+		result.value = result.value.mul(m);
+	result.type = 'matrix';
+	return result;
+}
+
+shmatmaton.stringMulNumber = function(s, n) {
+	var result = new shmatmaton.Instruction();
+	result.value = "";
+	for (var i=0; i<n; i++)
+		result.value += s;
+	result.type = 'string';
+	return result;
+}
+
+shmatmaton.stringSubNumber = function(s, n) {
+	var result = new shmatmaton.Instruction();
+	result.value = "";
+	var l = s.length - n;
+	if (l > 0)
+		result.value = s.substr(0, l);
+	result.type = 'string';
+	return result;
+}
+
+shmatmaton.stringDivNumber = function(s, n) {
+	var result = new shmatmaton.Instruction();
+	result.value = "";
+	var l = s.length / n;
+	if (l > 0)
+		result.value = s.substr(0, l);
+	result.type = 'string';
+	return result;
+}
 
 
 
@@ -78,6 +161,7 @@ shmatmaton.Instruction.prototype.guess = function(arg) {
 	}
 	if (this.type == 'function')
 		this.arity = this.value.length;
+	return this;
 };
 
 
@@ -91,7 +175,7 @@ shmatmaton.Instruction.prototype.isNop = function() {
 };
 
 
-// Wrap a platform function executiopn
+// Wrap a platform function execution
 shmatmaton.Instruction.prototype.funcWrap = function() {
 	// Build arg strings
 	var argStr = this.args.length ? JSON.stringify(this.args[0].value) : "";
@@ -108,8 +192,7 @@ shmatmaton.Instruction.prototype.funcWrap = function() {
 	}
 	if (typeof(result.value) == 'undefined')
 		return;
-	result.guess();
-	return result;
+	return result.guess();
 };
 
 
@@ -119,15 +202,22 @@ shmatmaton.Instruction.prototype.add = function(arg1, arg2) {
 	if (arg2.isNop()) return arg1;
 	// on invalid arguments return nop
 	var result = new shmatmaton.Instruction();
-	if (arg1.type == 'matrix' && arg2.type == 'matrix') {
-		result.value = arg1.value.add(arg2.value);
-		result.type = 'matrix';
+	if (arg1.type == 'number') { 
+		if (arg2.type == 'number' || arg2.type == 'string')
+			return result.guess(arg1.value + arg2.value);
+		if (arg2.type == 'matrix')
+			return shmatmaton.matrixAddNumber(arg2.value, arg1.value);
 		return result;
 	}
-	if (['number','string'].indexOf(arg1.type) == -1
-		|| ['number','string'].indexOf(arg2.type) == -1)
+	if (arg1.type == 'string' && (arg2.type == 'number' || arg2.type == 'string'))
+		return result.guess(arg1.value + arg2.value);
+	if (arg1.type == 'matrix') { 
+		if (arg2.type == 'matrix')
+			return shmatmaton.matrixAddMatrix(arg1.value, arg2.value);
+		if (arg2.type == 'number')
+			return shmatmaton.matrixAddNumber(arg1.value, arg2.value);
 		return result;
-	result.guess(arg1.value + arg2.value);
+	}
 	return result;
 };
 
@@ -138,9 +228,17 @@ shmatmaton.Instruction.prototype.sub = function(arg1, arg2) {
 	if (arg2.isNop()) return arg1;
 	// on invalid arguments return nop
 	var result = new shmatmaton.Instruction();
-	if (arg1.type != 'number' || arg2.type != 'number')
+	if (arg1.type == 'number' && arg2.type == 'number')
+		return result.guess(arg1.value - arg2.value);
+	if (arg1.type == 'string' && arg2.type == 'number')
+		return shmatmaton.stringSubNumber(arg1.value, arg2.value);
+	if (arg1.type == 'matrix') { 
+		if (arg2.type == 'matrix')
+			return shmatmaton.matrixAddMatrix(arg1.value, arg2.value.mulNum(-1));
+		if (arg2.type == 'number')
+			return shmatmaton.matrixAddNumber(arg1.value, -arg2.value);
 		return result;
-	result.guess(arg1.value - arg2.value);
+	}
 	return result;
 };
 
@@ -151,19 +249,24 @@ shmatmaton.Instruction.prototype.mul = function(arg1, arg2) {
 	if (arg2.isNop()) return arg1;
 	// on invalid arguments return nop
 	var result = new shmatmaton.Instruction();
-	if (arg1.type == 'matrix' && arg2.type == 'matrix') {
-		result.value = arg1.value.mul(arg2.value);
-		result.type = 'matrix';
+	if (arg1.type == 'number') { 
+		if (arg2.type == 'number')
+			return result.guess(arg1.value * arg2.value);
+		if (arg2.type == 'string')
+			return shmatmaton.stringMulNumber(arg2.value, arg1.value);
+		if (arg2.type == 'matrix')
+			return shmatmaton.matrixMulNumber(arg2.value, arg1.value);
 		return result;
 	}
-	if (arg1.type == 'number' && arg2.type == 'matrix') {
-		result.value = arg2.value.mulNum(arg1.value);
-		result.type = 'matrix';
+	if (arg1.type == 'string' && arg2.type == 'number')
+		return shmatmaton.stringMulNumber(arg1.value, arg2.value);
+	if (arg1.type == 'matrix') { 
+		if (arg2.type == 'matrix')
+			return shmatmaton.matrixMulMatrix(arg1.value, arg2.value);
+		if (arg2.type == 'number')
+			return shmatmaton.matrixMulNumber(arg1.value, arg2.value);
 		return result;
 	}
-	if (arg1.type != 'number' || arg2.type != 'number')
-		return result;
-	result.guess(arg1.value * arg2.value);
 	return result;
 };
 
@@ -174,15 +277,29 @@ shmatmaton.Instruction.prototype.div = function(arg1, arg2) {
 	if (arg2.isNop()) return arg1;
 	// on invalid arguments return nop
 	var result = new shmatmaton.Instruction();
-	if (arg1.type == 'number' && arg2.type == 'matrix'
-		&& arg1.value == 1) {
-		result.value = arg2.value.inv();
-		result.type = 'matrix';
+	if (arg1.type == 'number') {
+		if (arg2.type == 'number' && arg2.value != 0)
+			return result.guess(arg1.value / arg2.value);
+		if (arg2.type == 'matrix') {
+			result = shmatmaton.matrixPowNumber(arg2.value, -1);
+			if (arg1.value != 1 && result.type == 'matrix')
+				result.value = result.value.mulNum(arg1.value);
+		}
 		return result;
 	}
-	if (arg1.type != 'number' || arg2.type != 'number')
+	if (arg1.type == 'string' && arg2.type == 'number' && arg2.value != 0)
+		return shmatmaton.stringDivNumber(arg1.value, arg2.value);
+	if (arg1.type == 'matrix') { 
+		if (arg2.type == 'matrix') {
+			var inv = arg2.value.inv();
+			if (!inv)
+				return result;
+			return shmatmaton.matrixMulMatrix(arg1.value, inv);
+		}
+		if (arg2.type == 'number' && arg2.value != 0)
+			return shmatmaton.matrixAddNumber(arg1.value, 1/arg2.value);
 		return result;
-	result.guess(arg1.value / arg2.value);
+	}
 	return result;
 };
 
@@ -193,15 +310,10 @@ shmatmaton.Instruction.prototype.pow = function(arg1, arg2) {
 	if (arg2.isNop()) return arg1;
 	// on invalid arguments return nop
 	var result = new shmatmaton.Instruction();
-	if (arg1.type == 'matrix' && arg2.type == 'number'
-		&& arg1.value == -1) {
-		result.value = arg1.value.inv();
-		result.type = 'matrix';
-		return result;
-	}
-	if (arg1.type != 'number' || arg2.type != 'number')
-		return result;
-	result.guess(Math.pow(arg1.value,arg2.value));
+	if (arg1.type == 'number' && arg2.type == 'number')
+		return result.guess(Math.pow(arg1.value,arg2.value));
+	if (arg1.type == 'matrix' && arg2.type == 'number')
+		return shmatmaton.matrixPowNumber(arg1.value, arg2.value);
 	return result;
 };
 
