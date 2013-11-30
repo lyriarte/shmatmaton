@@ -43,16 +43,24 @@ Instructions
 All instructions are executed on the stack, in reverse Polish order. That is, instruction
 '-' pops arg2, pops arg1, and pushes arg1 - arg2.
 
-  * '+' : [a,b,+] => push a + b
-  * '-' : [a,b,-] => push a - b
-  * '*' : [a,b,*] => push a * b
-  * '/' : [a,b,/] => push a / b
-  * '^' : [a,b,^] => push a ^ b
-  * 'peek' [addr,peek] => push the content of the heap at address addr. push a NOP on null content.
-  * 'poke' [value,addr,poke] => put value in the heap at address addr.
-  * 'jnz' [arg,addr,jnz] => jump to addr if arg is not numeric zero, or empty string.
-  * 'dup' [arg,dup] => [arg,arg] duplicates arg on top of the stack.
+### Arithmetic operations
+  * + : [a, b, +] => push a + b
+  * - : [a, b, -] => push a - b
+  * * : [a, b, *] => push a * b
+  * / : [a, b, /] => push a / b
+  * ^ : [a, b, ^] => push a ^ b
+
+### Stack instructions
+  * nop [ ] => do nothing. on the stack, identity element for arithmetic operations
+  * dup [arg, dup] => [arg, arg] duplicates arg on top of the stack.
+
+### Heap instructions
+  * peek [addr, peek] => push the content of the heap at address addr. push a nop on null content.
+  * poke [value, addr, poke] => put value in the heap at address addr.
+
+### Transition instructions
+  * jnz [arg, addr, jnz] => jump to addr if arg is not numeric zero, or empty string.
 
 Everything Shmatmaton deals with is an instruction, interpreting a base-type object just means
-pushing it on the stack. Invalid instructions are replaced by a NOP at parse time.
+pushing it on the stack. Invalid instructions are replaced by a nop at parse time.
 
