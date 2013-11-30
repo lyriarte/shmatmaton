@@ -41,17 +41,17 @@ Instructions
 ------------
 
 All instructions are executed on the stack, in reverse Polish order. That is, instruction
-'-' pops 2 arguments, arg1 and arg2, from the stack, and pushes the result instead.
+'-' pops arg2, pops arg1, and pushes arg1 - arg2.
 
-  * '+' : a + b, push arg1 added to arg2.
-  * '-' : a - b, push arg2 substracted from arg1.
-  * '*' : a * b, push arg1 multiplied by arg2.
-  * '/' : a / b, push arg1 divided by arg2.
-  * '^' : a ^ b, push arg1 raised to the power of arg2.
-  * 'peek' addr: push the content of the heap at address addr. push a NOP on null content.
-  * 'poke' value, addr: put value in the heap at address addr.
-  * 'jnz' arg, addr: jump to addr if arg is not numeric zero, or empty string.
-  * 'dup' arg: duplicates arg on the stack.
+  * '+' : [a,b,+] => push a + b
+  * '-' : [a,b,-] => push a - b
+  * '*' : [a,b,*] => push a * b
+  * '/' : [a,b,/] => push a / b
+  * '^' : [a,b,^] => push a ^ b
+  * 'peek' [addr,peek] => push the content of the heap at address addr. push a NOP on null content.
+  * 'poke' [value,addr,poke] => put value in the heap at address addr.
+  * 'jnz' [arg,addr,jnz] => jump to addr if arg is not numeric zero, or empty string.
+  * 'dup' [arg,dup] => [arg,arg] duplicates arg on top of the stack.
 
 Everything Shmatmaton deals with is an instruction, interpreting a base-type object just means
 pushing it on the stack. Invalid instructions are replaced by a NOP at parse time.
