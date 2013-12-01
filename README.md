@@ -60,6 +60,7 @@ All instructions are executed on the stack, in reverse Polish order. That is, in
 
 ### Transition instructions
   * jnz [arg, addr, jnz] => jump to addr if arg is not numeric zero, or empty string.
+  * trans [arg, {cond1: addr1, ...condN: addrN}] => jump to addrX if arg equals condX.
 
 Everything Shmatmaton deals with is an instruction, interpreting a base-type object just means
 pushing it on the stack. Invalid instructions are replaced by a nop at parse time.

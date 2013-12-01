@@ -175,11 +175,6 @@ shmatmaton.Instruction.prototype.guess = function(arg) {
 };
 
 
-shmatmaton.Instruction.prototype.nop = function() {
-	return;
-};
-
-
 shmatmaton.Instruction.prototype.isNop = function() {
 	return this.value == shmatmaton.Instruction.prototype.nop;
 };
@@ -206,6 +201,10 @@ shmatmaton.Instruction.prototype.funcWrap = function() {
 		return;
 	return result.guess();
 };
+
+
+
+/*****************************************************************************/
 
 
 shmatmaton.Instruction.prototype.add = function(arg1, arg2) {
@@ -330,6 +329,17 @@ shmatmaton.Instruction.prototype.pow = function(arg1, arg2) {
 };
 
 
+shmatmaton.Instruction.prototype.nop = function() {
+	return;
+};
+
+
+shmatmaton.Instruction.prototype.dup = function(arg) {
+	shmatmaton.stack.push(arg);
+	return arg;
+};
+
+
 shmatmaton.Instruction.prototype.peek = function(addr) {
 	if (addr.type != 'number' || !shmatmaton.heap[addr.value])
 		return new shmatmaton.Instruction();
@@ -353,12 +363,6 @@ shmatmaton.Instruction.prototype.jnz = function(arg, addr) {
 };
 
 
-shmatmaton.Instruction.prototype.dup = function(arg) {
-	shmatmaton.stack.push(arg);
-	return arg;
-};
-
-
 shmatmaton.Instruction.prototype.trans = function(arg) {
 	for (var t in this.transitions) {
 		if (arg.value == t) {
@@ -373,17 +377,17 @@ shmatmaton.Instruction.prototype.trans = function(arg) {
 /*****************************************************************************/
 
 shmatmaton.instructions = {
-	'nop': shmatmaton.Instruction.prototype.nop,
 	'+': shmatmaton.Instruction.prototype.add,
 	'-': shmatmaton.Instruction.prototype.sub,
 	'*': shmatmaton.Instruction.prototype.mul,
 	'/': shmatmaton.Instruction.prototype.div,
 	'^': shmatmaton.Instruction.prototype.pow,
+	'nop': shmatmaton.Instruction.prototype.nop,
+	'dup': shmatmaton.Instruction.prototype.dup,
 	'peek': shmatmaton.Instruction.prototype.peek,
 	'poke': shmatmaton.Instruction.prototype.poke,
 	'jnz': shmatmaton.Instruction.prototype.jnz,
-	'dup': shmatmaton.Instruction.prototype.dup,
-	'trans': shmatmaton.Instruction.prototype.trans,
+	'trans': shmatmaton.Instruction.prototype.trans
 };
 
 
