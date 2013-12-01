@@ -193,6 +193,8 @@ shmatmaton.Instruction.prototype.funcWrap = function() {
 		argStr += "," + JSON.stringify(this.args[i].value);
 	var result = new shmatmaton.Instruction();
 	try {
+		if (shmatmaton.log)
+			shmatmaton.log("platform exec: " + this.funcName + "(" + argStr + ")");
 		result.value = eval(this.funcName + "(" + argStr + ")" );
 	}
 	catch (e) {
