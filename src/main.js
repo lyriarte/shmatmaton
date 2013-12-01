@@ -467,6 +467,19 @@ shmatmaton.step = function() {
 };
 
 
+shmatmaton.run = function(ms) {
+	if (typeof(ms) != 'number')
+		ms = 50;
+	var runId = -1;
+	
+	function runTask() {
+		if (shmatmaton.step() == -1)
+			clearInterval(runId);
+	}
+	
+	runId = setInterval(runTask, ms);
+};
+
 
 /*****************************************************************************/
 

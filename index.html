@@ -16,13 +16,15 @@
         <center><h1>shmatmaton</h1></center>
 <p>Hit <b>eval</b> to parse the source code, <b>step</b> to execute the next instruction, <b>reset</b> to start over. 
 </p>
-		<input type="button" style="width:32%" value="eval" onclick="evalScript()"/>
-		<input type="button" style="width:32%" value="reset" onclick="shmatmaton.reset()"/>
-		<input type="button" style="width:32%" value="step" onclick="shmatmaton.step()"/>
+		<input type="button" style="width:49%" value="eval" onclick="evalScript()"/>
+		<input type="button" style="width:49%" value="reset" onclick="shmatmaton.reset()"/>
 		<br>
-		<input type="button"  style="width:95%" value="clear log" onclick="document.getElementById('log').innerHTML='';"/>
+		<input type="button" style="width:49%" value="step" onclick="shmatmaton.step()"/>
+		<input type="button" style="width:49%" value="run" onclick="shmatmaton.run()"/>
 		<br>
-        <table style="width:95%">
+		<input type="button"  style="width:98%" value="clear log" onclick="document.getElementById('log').innerHTML='';"/>
+		<br>
+        <table style="width:98%">
         <tr>
         <td style="width:50%">
 <textarea rows="24" id="script">
