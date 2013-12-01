@@ -1,6 +1,6 @@
 SOURCES =  \
-	matrix.js \
-	main.js
+	main.js \
+	matrix.js
 
 DESTINATION = ..
 
@@ -10,6 +10,9 @@ $(TARGET): $(SOURCES)
 	cat $(SOURCES) > $(TARGET)
 
 all: $(TARGET)
+
+node: all
+	echo "exports.shmatmaton = shmatmaton;" >> $(TARGET)
 
 clean:
 	rm $(TARGET)
