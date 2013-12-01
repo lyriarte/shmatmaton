@@ -117,7 +117,10 @@ shmatmaton.Instruction = function(str) {
 	}
 	catch (e) {
 		// Try shmatmaton instructions
-		var func = shmatmaton.instructions[str];
+		var func;
+		var words = str.match(/[\w]+/);
+		if (words && words.length == 1)
+			func = shmatmaton.instructions[words[0]];
 		if (func)
 			this.guess(func);
 		else {
