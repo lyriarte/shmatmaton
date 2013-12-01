@@ -14,6 +14,7 @@ var shmatmaton = {
 	heap: [],
 	stack: [],
 	code: [],
+	labels: {},
 	ip: 0
 };
 
@@ -116,6 +117,11 @@ shmatmaton.Instruction = function(str) {
 		this.guess(JSON.parse(str));
 	}
 	catch (e) {
+		// Try labels
+		if (str[0] == '@' && str.match(/[\w]+/)) {
+			this.label = str.match(/[\w]+/)[0];
+			return this;
+		}
 		// Try shmatmaton instructions
 		var func;
 		var words = str.match(/[\w\+\-\*\/\^]+/);
@@ -355,18 +361,18 @@ shmatmaton.Instruction.prototype.poke = function(value, addr) {
 
 
 shmatmaton.Instruction.prototype.jnz = function(arg, addr) {
-	if (addr.type != 'number' || !shmatmaton.code[addr.value])
-		return;
+	// continue if value is zero
 	if (['number','string'].indexOf(arg.type) != -1 && !arg.value)
 		return;
-	shmatmaton.ip = addr.value;
+	// otherwise goto addr
+	shmatmaton.goto(addr.value);
 };
 
 
 shmatmaton.Instruction.prototype.trans = function(arg) {
 	for (var t in this.transitions) {
 		if (arg.value == t) {
-			shmatmaton.ip = this.transitions[t];
+			shmatmaton.goto(this.transitions[t]);
 			break;
 		}
 	}
@@ -397,8 +403,11 @@ shmatmaton.instructions = {
 shmatmaton.parse = function(instructions) {
 	shmatmaton.ip = 0;
 	shmatmaton.code = new Array(instructions.length);
+	shmatmaton.labels = {};
 	for (var i=0; i<instructions.length; i++) {
 		shmatmaton.code[i] = new shmatmaton.Instruction(instructions[i]);
+		if (shmatmaton.code[i].label)
+			shmatmaton.labels[shmatmaton.code[i].label] = i;
 		if (shmatmaton.log)
 			shmatmaton.log(i + ": " + instructions[i] + " => " + JSON.stringify(shmatmaton.code[i]));
 	}
@@ -410,6 +419,18 @@ shmatmaton.reset = function() {
 	shmatmaton.stack = [];
 	shmatmaton.ip = 0;
 };
+
+
+shmatmaton.goto = function(value) {
+	switch (typeof value) {
+		case 'number':
+			shmatmaton.ip = value;
+			break;
+		case 'string':
+			shmatmaton.ip = shmatmaton.labels[value];
+			break;
+	}
+}
 
 
 shmatmaton.step = function() {
