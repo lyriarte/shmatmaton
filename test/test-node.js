@@ -8,7 +8,7 @@
 
 /*****************************************************************************/
 
-var shmatmaton = require('./shmatmaton.js').shmatmaton;
+var shmatmaton = require('../shmatmaton/shmatmaton.js').shmatmaton;
 console.log("shmatmaton.version:" + shmatmaton.version);
 
 shmatmaton.log = console.log;

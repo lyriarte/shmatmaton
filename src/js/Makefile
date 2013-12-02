@@ -2,7 +2,7 @@ SOURCES =  \
 	main.js \
 	matrix.js
 
-DESTINATION = ..
+DESTINATION = ../../shmatmaton
 
 TARGET = $(DESTINATION)/shmatmaton.js
 
