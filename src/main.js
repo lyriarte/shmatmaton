@@ -245,8 +245,13 @@ shmatmaton.Instruction.prototype.sub = function(arg1, arg2) {
 	if (arg2.isNop()) return arg1;
 	// on invalid arguments return nop
 	var result = new shmatmaton.Instruction();
-	if (arg1.type == 'number' && arg2.type == 'number')
-		return result.guess(arg1.value - arg2.value);
+	if (arg1.type == 'number') { 
+		if (arg2.type == 'number')
+			return result.guess(arg1.value - arg2.value);
+		if (arg2.type == 'matrix')
+			return shmatmaton.matrixAddNumber(arg2.value.mulNum(-1), arg1.value);
+		return result;
+	}
 	if (arg1.type == 'string' && arg2.type == 'number')
 		return shmatmaton.stringSubNumber(arg1.value, arg2.value);
 	if (arg1.type == 'matrix') { 
@@ -314,7 +319,7 @@ shmatmaton.Instruction.prototype.div = function(arg1, arg2) {
 			return shmatmaton.matrixMulMatrix(arg1.value, inv);
 		}
 		if (arg2.type == 'number' && arg2.value != 0)
-			return shmatmaton.matrixAddNumber(arg1.value, 1/arg2.value);
+			return shmatmaton.matrixMulNumber(arg1.value, 1/arg2.value);
 		return result;
 	}
 	return result;
