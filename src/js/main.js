@@ -365,6 +365,38 @@ shmatmaton.Instruction.prototype.poke = function(value, addr) {
 };
 
 
+shmatmaton.Instruction.prototype.peetrix = function(lines, cols, addr) {
+	var result = new shmatmaton.Instruction();
+	if (lines.type != 'number' || cols.type != 'number' || addr.type != 'number')
+		return result;
+	var mat = new Matrix(lines.value, cols.value);
+	var k = addr.value;
+	for (var i=0; i<lines.value; i++) {
+		for (var j=0; j<cols.value; j++) {
+			if (!shmatmaton.heap[k] || shmatmaton.heap[k].type != 'number')
+				return result;
+			mat.cell[i][j] = shmatmaton.heap[k++].value;
+		}
+	}
+	result.value = mat;
+	result.type = 'matrix';
+	return result;
+};
+
+
+shmatmaton.Instruction.prototype.potrix = function(value, addr) {
+	if (value.type != 'matrix' || addr.type != 'number')
+		return;
+	var mat = value.value;
+	var k = addr.value;
+	for (var i=0; i<mat.nLines; i++) {
+		for (var j=0; j<mat.nCols; j++) {
+			shmatmaton.heap[k++] = new shmatmaton.Instruction().guess(mat.cell[i][j]);
+		}
+	}
+};
+
+
 shmatmaton.Instruction.prototype.jnz = function(arg, addr) {
 	// continue if value is zero
 	if (['number','string'].indexOf(arg.type) != -1 && !arg.value)
@@ -397,6 +429,8 @@ shmatmaton.instructions = {
 	'dup': shmatmaton.Instruction.prototype.dup,
 	'peek': shmatmaton.Instruction.prototype.peek,
 	'poke': shmatmaton.Instruction.prototype.poke,
+	'peetrix': shmatmaton.Instruction.prototype.peetrix,
+	'potrix': shmatmaton.Instruction.prototype.potrix,
 	'jnz': shmatmaton.Instruction.prototype.jnz,
 	'trans': shmatmaton.Instruction.prototype.trans
 };

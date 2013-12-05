@@ -57,6 +57,9 @@ All instructions are executed on the stack, in reverse Polish order. That is, in
 ### Heap instructions
   * peek [addr, peek] => push the content of the heap at address addr. push a nop on null content.
   * poke [value, addr, poke] => put value in the heap at address addr.
+  * peetrix [lines, cols, addr, peetrix] => push a matrix with the contents of the heap from addresses addr to addr + lines * cols.
+Push a nop if part of the range content is null or non numeric.
+  * potrix [matrix, addr, potrix] => put matrix contents in the heap from addresses addr to addr + matrix lines * cols.
 
 ### Transition instructions
   * jnz [arg, addr, jnz] => jump to addr if arg is not numeric zero, or empty string.
