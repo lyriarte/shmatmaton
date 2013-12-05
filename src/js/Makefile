@@ -7,6 +7,7 @@ DESTINATION = ../../shmatmaton
 TARGET = $(DESTINATION)/shmatmaton.js
 
 $(TARGET): $(SOURCES)
+	mkdir -p $(DESTINATION)
 	cat $(SOURCES) > $(TARGET)
 
 all: $(TARGET)
