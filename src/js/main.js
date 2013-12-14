@@ -122,31 +122,35 @@ shmatmaton.Instruction = function(str) {
 			this.label = str.match(/[\w]+/)[0];
 			return this;
 		}
-		// Try shmatmaton instructions
-		var func;
+		// Strip the string to get an identifier
 		var words = str.match(/[\w\+\-\*\/\^]+/);
-		if (words && words.length == 1)
-			func = shmatmaton.instructions[words[0]];
+		if (!words || words.length != 1)
+			return this;
+		var ident = words[0];
+		// Try shmatmaton instructions
+		var func = shmatmaton.instructions[ident];
 		if (func)
-			this.guess(func);
-		else {
+			return this.guess(func);
+		// Let the platform evaluate the identifier in usual object contexts
+		var contexts = ["", "Math.", "document.", "window."];
+		for (var i=0; i<contexts.length; i++) {
 			try {
-				// Let the platform evaluate the string
-				func = eval(str);
-				// Check if the string evaluates as a function on the platform
+				func = eval(contexts[i] + ident);
+				// Check if the string evaluates as a function
 				if (typeof(func) == 'function') {
 					// Make it an instruction that will wrap the platform function
 					this.guess(shmatmaton.Instruction.prototype.funcWrap);
 					this.arity = func.length;
 					this.funcHandle = func;
-					this.funcName = str;
+					this.funcName = contexts[i] + ident;
+					return this;
 				}
 			}
 			catch (ee) {
-				if (shmatmaton.log)
-					shmatmaton.log(ee);
-			};
+			};					
 		}
+		if (shmatmaton.log)
+			shmatmaton.log("Nop function: " + ident);
 	}
 	return this;
 };
@@ -158,12 +162,13 @@ shmatmaton.Instruction.prototype.guess = function(arg) {
 		this.value = arg;
 	this.type = typeof this.value;
 	this.arity = undefined;
-	// Interpret two dimensional arrays as matrix
 	if (this.type == 'object') {
+		// Interpret two dimensional arrays as matrix
 		if (this.value.length && this.value[0].length) {
 			this.value = new Matrix(this.value.length, this.value[0].length, this.value);
 			this.type = 'matrix';
 		}
+		// Interpret hash objects as transitions
 		else {
 			this.type = 'function';
 			this.transitions = this.value;
