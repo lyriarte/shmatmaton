@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script src="shmatmaton.js"></script>
+        <script type="text/javascript">
+        shmatmaton.log = function(str) {
+			document.getElementById('log').innerHTML += str + "<br>"
+        }
+		function evalScript() {
+			var instructions = document.getElementById('script').value.split("\n");
+			shmatmaton.parse(instructions);
+		}
+        </script>
+    </head>
+   <body>
+        <center><h1>shmatmaton</h1></center>
+<p>Hit <b>eval</b> to parse the source code, <b>step</b> to execute the next instruction, <b>reset</b> to start over. 
+</p>
+		<input type="button" style="width:49%" value="eval" onclick="evalScript()"/>
+		<input type="button" style="width:49%" value="reset" onclick="shmatmaton.reset()"/>
+		<br>
+		<input type="button" style="width:49%" value="step" onclick="shmatmaton.step()"/>
+		<input type="button" style="width:49%" value="run" onclick="shmatmaton.run()"/>
+		<br>
+		<input type="button"  style="width:98%" value="clear log" onclick="document.getElementById('log').innerHTML='';"/>
+		<br>
+        <table style="width:98%">
+        <tr>
+        <td style="width:50%">
+<textarea rows="24" id="script">
+[[1,2,4],[2,2,0],[3,0,4]]
+0
+poke
+3
+@loop
+1
+-
+
+dup
+"loop"
+jnz
+
+1
+0
+peek
+/
+0
+peek
+*
+</textarea>
+        </td>
+        <td style="width:50%">
+        <pre id="log" style="background-color: #faa;"></pre>
+        </td>
+        </table>
+   </body>
+</html>
