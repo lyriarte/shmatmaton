@@ -525,5 +525,18 @@ shmatmaton.run = function(ms) {
 };
 
 
+
+/*****************************************************************************/
+
+shmatmaton.boink = function(src1, src2) {
+	var instructions = new Array(src1.length < src2.length ? src1.length : src2.length);
+	for (var i=0; i<instructions.length; i++) {
+		instructions[i] = Math.random() < 0.5 ? src1[i] : src2[i];
+	}
+	shmatmaton.parse(instructions);
+};
+
+
+
 /*****************************************************************************/
 
