@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script src="../shmatmaton/shmatmaton.js"></script>
+<script type="text/javascript">
+	var src1, src2;
+	shmatmaton.log = function(str) {
+			document.getElementById('log').innerHTML += str + "<br>"
+	}
+	function loadScript(url) {
+		var xmlhttp=new XMLHttpRequest();
+
+		xmlhttp.onreadystatechange=function() {
+			if (xmlhttp.readyState==4 && xmlhttp.status==200) {
+				var src = xmlhttp.responseText.split("\n");
+				if (src1) {
+					src2 = src;
+					document.getElementById('log').innerHTML = "";
+					shmatmaton.boink(src1, src2);
+					shmatmaton.log("<hr>");
+					shmatmaton.reset();
+					shmatmaton.run();
+				}
+				else
+					src1 = src;
+			}
+		}
+
+		xmlhttp.open("GET", url, true);
+		xmlhttp.send();
+	}
+</script>
+</head>
+
+<body>
+
+<input type="button" value="boink" 
+  onclick="loadScript(document.getElementById('url1').value);loadScript(document.getElementById('url2').value);"/>
+<input id="url1" type="text" value="/test1.shm"/>
+<input id="url2" type="text" value="/test2.shm"/>
+
+
+<hr>
+<pre id="log" style="background-color: #faa;"></pre>
+
+</body>
+</html>
