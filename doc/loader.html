@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script src="../shmatmaton/shmatmaton.js"></script>
+<script type="text/javascript">
+	shmatmaton.log = function(str) {
+			document.getElementById('log').innerHTML += str + "<br>"
+	}
+	function loadScript(url) {
+		var xmlhttp=new XMLHttpRequest();
+
+		xmlhttp.onreadystatechange=function() {
+			if (xmlhttp.readyState==4 && xmlhttp.status==200) {
+				document.getElementById('log').innerHTML = "";
+				shmatmaton.parse(xmlhttp.responseText.split("\n"));
+				shmatmaton.log("<hr>");
+				shmatmaton.reset();
+				shmatmaton.run();
+			}
+		}
+
+		xmlhttp.open("GET", url, true);
+		xmlhttp.send();
+	}
+</script>
+</head>
+
+<body>
+
+<input type="button" value="load" onclick="loadScript(document.getElementById('url').value)"/>
+<input id="url" type="text" value="/test.shm"/>
+
+<hr>
+<pre id="log" style="background-color: #faa;"></pre>
+
+</body>
+</html>
