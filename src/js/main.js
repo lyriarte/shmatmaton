@@ -411,6 +411,17 @@ shmatmaton.Instruction.prototype.jnz = function(arg, addr) {
 };
 
 
+shmatmaton.Instruction.prototype.jle = function(arg1, arg2, addr) {
+	// continue if arg1 > arg2
+	if (arg1.type == 'number' && arg2.type == 'number' && arg1.value > arg2.value)
+		return;
+	if (arg1.type == 'string' && arg2.type == 'string' && arg1.value.length > arg2.value.length)
+		return;
+	// otherwise goto addr
+	shmatmaton.goto(addr.value);
+};
+
+
 shmatmaton.Instruction.prototype.trans = function(arg) {
 	for (var t in this.transitions) {
 		if (arg.value == t) {
@@ -437,6 +448,7 @@ shmatmaton.instructions = {
 	'peetrix': shmatmaton.Instruction.prototype.peetrix,
 	'potrix': shmatmaton.Instruction.prototype.potrix,
 	'jnz': shmatmaton.Instruction.prototype.jnz,
+	'jle': shmatmaton.Instruction.prototype.jle,
 	'trans': shmatmaton.Instruction.prototype.trans
 };
 

@@ -63,6 +63,7 @@ Push a nop if part of the range content is null or non numeric.
 
 ### Transition instructions
   * jnz [arg, addr, jnz] => jump to addr if arg is not numeric zero, or empty string.
+  * jle [arg1, arg2, addr, jle] => jump to addr if arg1 is inferior or equal to arg2
   * trans [arg, {cond1: addr1, ...condN: addrN}] => jump to addrX if arg equals condX.
 
 Everything Shmatmaton deals with is an instruction, interpreting a base-type object just means
